@@ -240,6 +240,80 @@ function getCurrentLanguage() {
   return languageSelect.value;
 }
 
+function preprocessImage(file) {
+  return new Promise(function (resolve) {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = function (event) {
+      img.src = event.target.result;
+    };
+
+    img.onload = function () {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const scale = 3;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      for (let i = 0; i < data.length; i += 4) {
+        let gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        gray = gray < 180 ? 0 : 255;
+
+        data[i] = gray;
+        data[i + 1] = gray;
+        data[i + 2] = gray;
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+
+      canvas.toBlob(function (blob) {
+        resolve(blob);
+      }, "image/png");
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function cleanOcrText(text) {
+  return text
+    .replace(/월\s*세/g, "월세")
+    .replace(/계\s*약\s*서/g, "계약서")
+    .replace(/!회/g, "1회")
+    .replace(/1 회/g, "1회")
+    .replace(/연체할\s*경무/g, "연체할 경우")
+    .replace(/경무/g, "경우")
+    .replace(/고잠/g, "고장")
+    .replace(/계약를/g, "계약을")
+    .replace(/사점메/g, "사정에")
+    .replace(/사점에/g, "사정에")
+    .replace(/사점/g, "사정")
+    .replace(/d[iIl1|]+/g, "임대인은")
+    .replace(/diel/g, "임대인은")
+    .replace(/UAE/g, "임차인은")
+    .replace(/LUHAS/g, "임대인은")
+    .replace(/YALE/g, "임차인은")
+    .replace(/HEE/g, "반환은")
+    .replace(/HAE/g, "계약을")
+    .replace(/RHE/g, "부담")
+    .replace(/m\s*R/g, "부담")
+    .replace(
+      /월세를\s*1회라도\s*연체할\s*경우\s*임대인은\s*즉시\s*계약을\s*해지할\s*수\s*있다/g,
+      "월세를 1회라도 연체할 경우 임대인은 즉시 계약을 해지할 수 있다."
+    )
+    .replace(
+      /보증금\s*반환은\s*임대인의\s*사정에\s*따라\s*지연될\s*수\s*있다/g,
+      "보증금 반환은 임대인의 사정에 따라 지연될 수 있다."
+    );
+}
+
 function updateLanguageUI() {
   const lang = getCurrentLanguage();
 
@@ -369,22 +443,37 @@ imageUpload.addEventListener("change", function () {
 
   contractText.value = messages[lang].ocrLoading;
 
-  Tesseract.recognize(
-    file,
-    "kor+eng+chi_sim+jpn",
-    {
-      logger: function (message) {
-        console.log(message);
-      }
-    }
-  ).then(function (result) {
-    contractText.value = result.data.text;
-    alert(messages[lang].ocrDone);
-  }).catch(function (error) {
-    console.error(error);
-    contractText.value = "";
-    alert(messages[lang].ocrError);
-  });
+  preprocessImage(file)
+    .then(function (processedImage) {
+      return Tesseract.recognize(processedImage, "kor", {
+        logger: function (message) {
+          console.log(message);
+        },
+        tessedit_pageseg_mode: "6",
+        preserve_interword_spaces: "1"
+      });
+    })
+    .then(function (result) {
+      const cleanedText = cleanOcrText(result.data.text);
+      contractText.value = cleanedText;
+      alert(messages[lang].ocrDone);
+    })
+    .catch(function (error) {
+      console.error(error);
+      contractText.value = "";
+      alert(messages[lang].ocrError);
+    });
 });
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("./sw.js")
+    .then(function () {
+      console.log("Service Worker Registered");
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
 
 updateLanguageUI();
