@@ -11,6 +11,8 @@ const finalTitle = document.getElementById("finalTitle");
 const scoreResult = document.getElementById("scoreResult");
 const finalResult = document.getElementById("finalResult");
 const riskList = document.getElementById("riskList");
+const opinionTitle = document.getElementById("opinionTitle");
+const aiOpinion = document.getElementById("aiOpinion");
 
 const monthlySampleText = `
 월세 계약서
@@ -51,7 +53,15 @@ const messages = {
     emptyAlert: "계약서 내용을 입력하거나 사진을 업로드해 주세요.",
     ocrLoading: "OCR로 계약서 이미지를 읽는 중입니다. 잠시만 기다려 주세요...",
     ocrDone: "OCR 텍스트 추출이 완료되었습니다.",
-    ocrError: "OCR 처리 중 오류가 발생했습니다. 더 선명한 사진으로 다시 시도해 주세요."
+    ocrError: "OCR 처리 중 오류가 발생했습니다. 더 선명한 사진으로 다시 시도해 주세요.",
+    opinionTitle: "AI 종합 의견",
+    opinionDefault: "분석 결과가 여기에 표시됩니다.",
+    opinionHigh: "본 계약서는 고위험 계약으로 분석되었습니다.",
+    opinionMedium: "본 계약서는 일부 위험 요소가 있는 계약으로 분석되었습니다.",
+    opinionLow: "현재까지 큰 위험 요소는 발견되지 않았습니다.",
+    opinionRecommendHigh: "권장: 계약 수정 또는 전문가 상담 후 진행하세요.",
+    opinionRecommendMedium: "권장: 위험 조항을 수정한 뒤 서명하세요.",
+    opinionRecommendLow: "권장: 기본 확인 후 계약 진행이 가능합니다."
   },
   en: {
     subtitle: "Multilingual rental contract risk analysis web app",
@@ -73,7 +83,15 @@ const messages = {
     emptyAlert: "Please enter contract text or upload an image.",
     ocrLoading: "Reading the contract image with OCR. Please wait...",
     ocrDone: "OCR text extraction is complete.",
-    ocrError: "An OCR error occurred. Please try again with a clearer image."
+    ocrError: "An OCR error occurred. Please try again with a clearer image.",
+    opinionTitle: "AI Overall Opinion",
+    opinionDefault: "The analysis result will appear here.",
+    opinionHigh: "This contract has been analyzed as a high-risk contract.",
+    opinionMedium: "This contract contains some risk factors.",
+    opinionLow: "No major risk factors have been found so far.",
+    opinionRecommendHigh: "Recommendation: Revise the contract or consult an expert before proceeding.",
+    opinionRecommendMedium: "Recommendation: Revise the risk clauses before signing.",
+    opinionRecommendLow: "Recommendation: You may proceed after a basic review."
   },
   zh: {
     subtitle: "月租·全租合同风险条款分析网页应用",
@@ -95,7 +113,15 @@ const messages = {
     emptyAlert: "请输入合同内容或上传图片。",
     ocrLoading: "正在使用 OCR 读取合同图片，请稍候...",
     ocrDone: "OCR 文本提取已完成。",
-    ocrError: "OCR 处理时发生错误。请使用更清晰的图片重试。"
+    ocrError: "OCR 处理时发生错误。请使用更清晰的图片重试。",
+    opinionTitle: "AI 综合意见",
+    opinionDefault: "分析结果将显示在这里。",
+    opinionHigh: "本合同被分析为高风险合同。",
+    opinionMedium: "本合同存在部分风险因素。",
+    opinionLow: "目前未发现重大风险因素。",
+    opinionRecommendHigh: "建议：修改合同或咨询专家后再进行。",
+    opinionRecommendMedium: "建议：修改风险条款后再签署。",
+    opinionRecommendLow: "建议：基本确认后可以进行签署。"
   },
   ja: {
     subtitle: "月額賃貸・チョンセ契約書リスク条項分析Webアプリ",
@@ -117,7 +143,15 @@ const messages = {
     emptyAlert: "契約書の内容を入力するか、画像をアップロードしてください。",
     ocrLoading: "OCRで契約書画像を読み取っています。しばらくお待ちください...",
     ocrDone: "OCRテキスト抽出が完了しました。",
-    ocrError: "OCR処理中にエラーが発生しました。より鮮明な画像で再試行してください。"
+    ocrError: "OCR処理中にエラーが発生しました。より鮮明な画像で再試行してください。",
+    opinionTitle: "AI総合意見",
+    opinionDefault: "分析結果がここに表示されます。",
+    opinionHigh: "本契約書は高リスク契約として分析されました。",
+    opinionMedium: "本契約書には一部リスク要素があります。",
+    opinionLow: "現時点で大きなリスク要素は見つかりませんでした。",
+    opinionRecommendHigh: "推奨：契約を修正するか、専門家に相談してから進めてください。",
+    opinionRecommendMedium: "推奨：リスク条項を修正してから署名してください。",
+    opinionRecommendLow: "推奨：基本確認後、契約を進めることができます。"
   }
 };
 
@@ -325,6 +359,8 @@ function updateLanguageUI() {
   analyzeBtn.textContent = messages[lang].analyze;
   scoreTitle.textContent = messages[lang].scoreTitle;
   finalTitle.textContent = messages[lang].finalTitle;
+  opinionTitle.textContent = messages[lang].opinionTitle;
+  aiOpinion.textContent = messages[lang].opinionDefault;
   scoreResult.textContent = "0" + messages[lang].point;
   finalResult.textContent = messages[lang].beforeAnalysis;
 
@@ -376,11 +412,44 @@ function getFinalDecision(score, lang) {
   return messages[lang].danger;
 }
 
+function generateOpinion(foundRisks, score, lang) {
+  let opinion = "";
+
+  if (score >= 70) {
+    opinion += messages[lang].opinionHigh + "\n\n";
+  } else if (score >= 30) {
+    opinion += messages[lang].opinionMedium + "\n\n";
+  } else {
+    opinion += messages[lang].opinionLow + "\n\n";
+  }
+
+  if (foundRisks.length > 0) {
+    opinion += messages[lang].riskTitle + "\n";
+
+    foundRisks.forEach(function (risk) {
+      opinion += "- " + risk.title[lang] + "\n";
+    });
+
+    opinion += "\n";
+  }
+
+  if (score >= 70) {
+    opinion += messages[lang].opinionRecommendHigh;
+  } else if (score >= 30) {
+    opinion += messages[lang].opinionRecommendMedium;
+  } else {
+    opinion += messages[lang].opinionRecommendLow;
+  }
+
+  return opinion;
+}
+
 function renderResult(foundRisks, totalScore, decision) {
   const lang = getCurrentLanguage();
 
   scoreResult.textContent = totalScore + messages[lang].point;
   finalResult.textContent = decision;
+  aiOpinion.textContent = generateOpinion(foundRisks, totalScore, lang);
 
   if (foundRisks.length === 0) {
     riskList.innerHTML = `
