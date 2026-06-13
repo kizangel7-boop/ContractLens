@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ContractLens</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>ContractLens</h1>
+      <p id="subtitle">월세·전세 계약서 위험 조항 분석 웹앱</p>
+
+      <select id="languageSelect">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+      </select>
+    </header>
+
+    <main>
+      <section class="button-section">
+        <button id="monthlySampleBtn">월세 샘플</button>
+        <button id="jeonseSampleBtn">전세 샘플</button>
+      </section>
+
+      <section class="upload-section">
+        <label id="uploadLabel" for="imageUpload">계약서 사진 업로드</label>
+        <input type="file" id="imageUpload" accept="image/*" />
+      </section>
+
+      <section class="input-section">
+        <textarea id="contractText"></textarea>
+      </section>
+
+      <section class="analyze-section">
+        <button id="analyzeBtn">분석하기</button>
+      </section>
+
+      <section class="result-section">
+        <div class="result-card">
+          <h2 id="scoreTitle">위험도 점수</h2>
+          <p id="scoreResult">0점</p>
+        </div>
+
+        <div class="result-card">
+          <h2 id="finalTitle">최종 판정</h2>
+          <p id="finalResult">분석 전</p>
+        </div>
+
+        <div class="risk-list" id="riskList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
