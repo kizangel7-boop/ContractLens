@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>ContractLens</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#2563eb" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -45,26 +50,20 @@
           <p id="scoreResult">0점</p>
         </div>
 
-    <section class="result-section">
-  <div class="result-card">
-    <h2 id="scoreTitle">위험도 점수</h2>
-    <p id="scoreResult">0점</p>
-  </div>
+        <div class="result-card">
+          <h2 id="finalTitle">최종 판정</h2>
+          <p id="finalResult">분석 전</p>
+        </div>
 
-  <div class="result-card">
-    <h2 id="finalTitle">최종 판정</h2>
-    <p id="finalResult">분석 전</p>
-  </div>
+        <div class="risk-list" id="riskList"></div>
 
-  <div class="risk-list" id="riskList"></div>
-
-  <div class="opinion-card">
-    <h2 id="opinionTitle">AI 종합 의견</h2>
-    <p id="aiOpinion">
-      분석 결과가 여기에 표시됩니다.
-    </p>
+        <div class="opinion-card">
+          <h2 id="opinionTitle">AI 종합 의견</h2>
+          <p id="aiOpinion">분석 결과가 여기에 표시됩니다.</p>
+        </div>
+      </section>
+    </main>
   </div>
-</section>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="app.js"></script>
