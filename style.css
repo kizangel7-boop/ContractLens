@@ -178,4 +178,27 @@ textarea {
   .risk-list {
     grid-column: 1;
   }
+  /* AI 종합 의견 카드 */
+
+.opinion-card {
+  grid-column: 1 / 3;
+  background: #eef6ff;
+  border-left: 6px solid #2563eb;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 10px;
+}
+
+.opinion-card h2 {
+  margin-top: 0;
+  color: #2563eb;
+  font-size: 20px;
+}
+
+#aiOpinion {
+  line-height: 1.8;
+  white-space: pre-line;
+  color: #333;
+  font-size: 15px;
+}
 }
