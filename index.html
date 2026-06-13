@@ -45,15 +45,26 @@
           <p id="scoreResult">0점</p>
         </div>
 
-        <div class="result-card">
-          <h2 id="finalTitle">최종 판정</h2>
-          <p id="finalResult">분석 전</p>
-        </div>
-
-        <div class="risk-list" id="riskList"></div>
-      </section>
-    </main>
+    <section class="result-section">
+  <div class="result-card">
+    <h2 id="scoreTitle">위험도 점수</h2>
+    <p id="scoreResult">0점</p>
   </div>
+
+  <div class="result-card">
+    <h2 id="finalTitle">최종 판정</h2>
+    <p id="finalResult">분석 전</p>
+  </div>
+
+  <div class="risk-list" id="riskList"></div>
+
+  <div class="opinion-card">
+    <h2 id="opinionTitle">AI 종합 의견</h2>
+    <p id="aiOpinion">
+      분석 결과가 여기에 표시됩니다.
+    </p>
+  </div>
+</section>
 
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="app.js"></script>
