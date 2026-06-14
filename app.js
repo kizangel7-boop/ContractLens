@@ -364,6 +364,9 @@ function updateLanguageUI() {
   scoreResult.textContent = "0" + messages[lang].point;
   finalResult.textContent = messages[lang].beforeAnalysis;
 
+  scoreResult.className = "";
+  finalResult.className = "";
+
   riskList.innerHTML = `
     <h2>${messages[lang].riskTitle}</h2>
     <p>${messages[lang].noRisk}</p>
@@ -444,11 +447,30 @@ function generateOpinion(foundRisks, score, lang) {
   return opinion;
 }
 
+function applyRiskColors(totalScore) {
+  scoreResult.className = "";
+  finalResult.className = "";
+
+  if (totalScore >= 70) {
+    scoreResult.classList.add("high-risk");
+    finalResult.classList.add("danger");
+  } else if (totalScore >= 30) {
+    scoreResult.classList.add("medium-risk");
+    finalResult.classList.add("warning");
+  } else {
+    scoreResult.classList.add("low-risk");
+    finalResult.classList.add("safe");
+  }
+}
+
 function renderResult(foundRisks, totalScore, decision) {
   const lang = getCurrentLanguage();
 
   scoreResult.textContent = totalScore + messages[lang].point;
   finalResult.textContent = decision;
+
+  applyRiskColors(totalScore);
+
   aiOpinion.textContent = generateOpinion(foundRisks, totalScore, lang);
 
   if (foundRisks.length === 0) {
